@@ -1,36 +1,30 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-IMAGE="nvidia/cuda:12.1.0-devel-ubuntu22.04"
-PROJECT_ROOT="$(pwd)"
-SQLITE_SRC="$PROJECT_ROOT/sqlite"
-BUILD_DIR="$PROJECT_ROOT/build"
+# IMAGE="${IMAGE:-nvidia/cuda:12.1.0-devel-ubuntu22.04}"
+IMAGE="cuda-12:latest"
 
-mkdir -p "$BUILD_DIR"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SQLITE_SRC="${SQLITE_SRC:-$PROJECT_ROOT/sqlite}"
+SCRIPTS_DIR="$PROJECT_ROOT/scripts"
+
+# Mirrors sqlite/build_gpu.bat behavior.
+OUT_DIR="${OUT_DIR:-$PROJECT_ROOT/build_gpu}"
+mkdir -p "$OUT_DIR"
 
 docker run --rm \
     --platform linux/amd64 \
     -v "$SQLITE_SRC":/sqlite:ro \
-    -v "$BUILD_DIR":/build \
-    -w /build \
+    -v "$OUT_DIR":/out \
+    -v "$SCRIPTS_DIR":/scripts:ro \
+    -w /out \
     "$IMAGE" \
-    /bin/bash -c "
-        if [ ! -f Makefile ]; then
-            /sqlite/configure && make sqlite3.c
-        else
-            make sqlite3.c
-        fi
+    /bin/bash /scripts/build_gpu_in_container.sh
 
-        gcc -O3 shell.c sqlite3.c \
-            -I. -I/usr/local/cuda/include \
-            -L/usr/local/cuda/lib64 \
-            -lcudart -lpthread -ldl -lm \
-            -o sqlite3
-    "
-
-if [ -f "$BUILD_DIR/sqlite3" ]; then
-    echo "binary is at: $BUILD_DIR/sqlite3"
-    file "$BUILD_DIR/sqlite3"
+if [ -f "$OUT_DIR/sqlite3" ]; then
+    echo "binary is at: $OUT_DIR/sqlite3"
+    file "$OUT_DIR/sqlite3"
 else
-    echo "error in building sqlite3"
+    echo "error building sqlite3"
+    exit 1
 fi

@@ -1,23 +1,30 @@
 CompileFlags:
-  Add: [
-    "-I/path/to/build",
-    "-I/path/to/build/tsrc",
-    
-    "-I/path/to/src",
-    "-I.",
-    
-    "-I/path/to/cuda_include",
-    # installed with `brew install sqlite`
-    "-I/opt/homebrew/opt/sqlite/include",
+  Add:
+    [
+      "-I/path-to/sqlite/build",
+      "-I/path-to/sqlite/build/tsrc",
 
-    "-isystem", "/Library/Developer/CommandLineTools/usr/include",
-    "-isystem", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
+      "-I/path-to/sqlite/src",
+      "-I.",
 
-    "-xc",
-    "-D__NVCC__",
-    "-DSQLITE_THREADSAFE=1",
-    "-DSQLITE_ENABLE_COLUMN_METADATA",
-    "-DSQLITE_CORE"
-  ]
-  
+      "-I/path-to/cuda_include",
+      # installed with `brew install sqlite`
+      "-I/opt/homebrew/opt/sqlite/include",
+
+      "-isystem",
+      "/Library/Developer/CommandLineTools/usr/include",
+      "-isystem",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
+
+      "-xc",
+      "-D__NVCC__",
+      "-DSQLITE_THREADSAFE=1",
+      "-DSQLITE_ENABLE_COLUMN_METADATA",
+      "-DSQLITE_ENABLE_GPU_SCAN=1",
+      "-DSQLITE_CORE",
+      "-D_HAVE_SQLITE_CONFIG_H",
+      "-include",
+      "sqliteInt.h",
+    ]
+
   Remove: ["-arch", "arm64", "-isysroot", "-target"]

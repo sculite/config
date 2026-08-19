@@ -24,7 +24,8 @@ tree -L1
 ├── build.sh # the build script
 ├── cuda_include # instructions in the previous section 
 ├── source.sh # source file with LDFLAGS and CPPFLAGS
-└── sqlite # the sculite/sqlite repository
+├── scripts/ # dir with scripts (`build_gpu_in_container.sh`)
+└── sqlite/ # the sculite/sqlite repository
 ```
 
 ```sh
